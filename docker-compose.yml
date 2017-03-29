@@ -1,0 +1,29 @@
+version: '2'
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.devel
+    working_dir: /go/src/github.com/porthos-rpc/porthos-playground
+    command: dockerize -wait tcp://broker:5672 -timeout 60s go run playground.go
+    links:
+     - broker
+    ports:
+     - "8080:8080"
+    environment:
+      BIND_ADDRESS: ":8080"
+      BROKER_URL: amqp://guest:guest@broker:5672/
+      DB_PATH: "./playground.db"
+    volumes:
+     - .:/go/src/github.com/porthos-rpc/porthos-playground/
+    hostname: playground
+  frontend:
+    build: client
+    command: npm run watch
+    volumes:
+      - ./client:/home/app/playground
+      - ./client/node_modules:/home/app/playground/node_modules
+  broker:
+    image: rabbitmq:3.6-management
+    ports:
+     - "15672:15672"
