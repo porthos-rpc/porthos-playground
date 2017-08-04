@@ -7,8 +7,15 @@ import (
 	"reflect"
 )
 
+// FieldSpec represents a spec of a body field.
+type FieldSpec struct {
+	Type        string      `json:type`
+	Description string      `json:description`
+	Body        BodySpecMap `json:"body,omitempty"`
+}
+
 // BodySpecMap represents a body spec.
-type BodySpecMap map[string]interface{}
+type BodySpecMap map[string]FieldSpec
 
 // Spec to a remote procedure.
 type Spec struct {

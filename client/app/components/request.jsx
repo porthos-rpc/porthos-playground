@@ -14,7 +14,7 @@ class Request extends React.Component {
             procedure: this.props.request.procedure,
             contentType: this.props.request.contentType,
             timeout: 5,
-            body: this.props.request.body
+            spec: this.props.request.spec
         };
     }
 
@@ -92,7 +92,8 @@ class Request extends React.Component {
                 <Input type='text' label='Procedure' name='procedure' defaultValue={this.props.request.procedure} onChange={this.handleProcedureChanged}/>
                 <Input type='text' label='Content Type' name='contentType' defaultValue={this.props.request.contentType} onChange={this.handleContentTypeChanged}/>
                 <Input type='number' label='Timeout' name='timeout' defaultValue={this.state.timeout.toString()} onChange={this.handleTimeoutChanged}/>
-                <Input type='text' label='Body' name='body' defaultValue={this.props.request.body} multiline onChange={this.handleBodyChanged}/>
+                <Input type='text' label='Spec' name='spec' value={this.props.request.spec} multiline onChange={this.handleBodyChanged}/>
+                <Input type='text' label='Body' name='body' multiline onChange={this.handleBodyChanged}/>
                 <Button label='Call' raised primary disabled={!this.state.callEnabled} onClick={this.doRPC}/>
 
                 <br/><br/><br/>

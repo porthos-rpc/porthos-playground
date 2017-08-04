@@ -5,7 +5,7 @@ import (
 )
 
 func TestBodySpecSimple(t *testing.T) {
-	specs, err := UnmarshalSpecs([]byte(`{ "service": "UserService", "specs": { "doSomething": { "contentType": "application/json", "body":{ "arg1": "float32", "arg2":" string", "arg3":" int" } }, "doSomethingElse": { "contentType": "application/json", "body":{ "arg1": "bool", "arg2":" int" } } } } `))
+	specs, err := UnmarshalSpecs([]byte(`{"service":"UserService","specs":{"doSomethingElse":{"contentType":"application/json","body":{"complex":{"Type":"struct","Description":"Required","body":{"value":{"Type":"bool","Description":""}}},"value":{"Type":"float32","Description":"Required"}}},"doSomethingThatReturnsValue":{"contentType":"application/json","body":{"someComplex":{"Type":"complex","Description":"Optional","body":{"value":{"Type":"int","Description":"Required"}}},"value":{"Type":"int","Description":"Required"}}}}}`))
 
 	if err != nil {
 		t.Fatal("UnmarshalSpecs failed.", err)

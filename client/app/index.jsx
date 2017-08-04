@@ -26,7 +26,7 @@ class App extends React.Component {
                 service: service,
                 procedure: procedure,
                 contentType: spec.contentType,
-                body: JSON.stringify(spec.body, null, 4)
+                spec: JSON.stringify(spec.body, null, 4)
             }
         });
     }
