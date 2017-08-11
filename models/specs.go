@@ -27,7 +27,7 @@ type Spec struct {
 // ContentSpec to a remote procedure.
 type ContentSpec struct {
 	ContentType string      `json:"contentType"`
-	Body        BodySpecMap `json:"body"`
+	Body        interface{} `json:"body"`
 }
 
 // SpecsMap map of string and Spec
