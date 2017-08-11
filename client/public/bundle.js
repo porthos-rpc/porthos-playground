@@ -97,6 +97,65 @@
 	            this.setState({ tab: tab });
 	        }
 	    }, {
+	        key: 'getFakeValueFrom',
+	        value: function getFakeValueFrom(fieldSpec) {
+	            if (typeof fieldSpec.body !== 'undefined') {
+	                return this.makeFakeBody('application/json', fieldSpec.body);
+	            }
+	
+	            switch (fieldSpec.type) {
+	                case 'int':
+	                    return 0;
+	                case 'int8':
+	                    return 0;
+	                case 'int16':
+	                    return 0;
+	                case 'int32':
+	                    return 0;
+	                case 'int64':
+	                    return 0;
+	                case 'uint':
+	                    return 0;
+	                case 'uint8':
+	                    return 0;
+	                case 'uint16':
+	                    return 0;
+	                case 'uint32':
+	                    return 0;
+	                case 'uint64':
+	                    return 0;
+	                case 'uintptr':
+	                    return 0;
+	                case 'byte':
+	                    return 0;
+	                case 'rune':
+	                    return 0;
+	                case 'float32':
+	                    return 0;
+	                case 'float64':
+	                    return 0;
+	                case 'bool':
+	                    return false;
+	                default:
+	                    return '';
+	            }
+	        }
+	    }, {
+	        key: 'makeFakeBody',
+	        value: function makeFakeBody(requestContentType, requestSpec) {
+	            if (requestContentType === 'application/json') {
+	                var body = {};
+	
+	                for (var k in requestSpec) {
+	                    body[k] = this.getFakeValueFrom(requestSpec[k]);
+	                }
+	
+	                return body;
+	            }
+	
+	            return "";
+	        }
+	    }, {
 	        key: 'fillRequest',
 	        value: function fillRequest(service, procedure, spec) {
 	            this.setState({
@@ -104,8 +163,11 @@
 	                request: {
 	                    service: service,
 	                    procedure: procedure,
-	                    contentType: spec.contentType,
-	                    spec: JSON.stringify(spec.body, null, 4)
+	                    requestContentType: spec.request.contentType,
+	                    requestSpec: JSON.stringify(spec.request.body, null, 4),
+	                    responseContentType: spec.response.contentType,
+	                    responseSpec: JSON.stringify(spec.response.body, null, 4),
+	                    fakeBody: JSON.stringify(this.makeFakeBody(spec.request.contentType, spec.request.body), null, 4)
 	                }
 	            });
 	        }
@@ -43700,7 +43762,7 @@
 	                            return _react2.default.createElement(_list.ListItem, {
 	                                key: service.service + spec,
 	                                caption: spec,
-	                                legend: 'Content-Type: ' + service.specs[spec].contentType,
+	                                legend: service.specs[spec].description,
 	                                onClick: function onClick() {
 	                                    return _this2.props.onServiceClicked(service.service, spec, service.specs[spec]);
 	                                } });
@@ -43746,6 +43808,10 @@
 	
 	var _progress_bar2 = _interopRequireDefault(_progress_bar);
 	
+	var _chip = __webpack_require__(/*! react-toolbox/lib/chip */ 213);
+	
+	var _chip2 = _interopRequireDefault(_chip);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -43767,15 +43833,15 @@
 	        };
 	
 	        _this2.handleServiceChanged = function (service) {
-	            _this2.setState({ service: service, callEnabled: _this2.isCallEnabled(service, _this2.state.procedure, _this2.state.contentType) });
+	            _this2.setState({ service: service, callEnabled: _this2.isCallEnabled(service, _this2.state.procedure, _this2.state.requestContentType) });
 	        };
 	
 	        _this2.handleProcedureChanged = function (procedure) {
-	            _this2.setState({ procedure: procedure, callEnabled: _this2.isCallEnabled(_this2.state.service, procedure, _this2.state.contentType) });
+	            _this2.setState({ procedure: procedure, callEnabled: _this2.isCallEnabled(_this2.state.service, procedure, _this2.state.requestContentType) });
 	        };
 	
 	        _this2.handleContentTypeChanged = function (contentType) {
-	            _this2.setState({ contentType: contentType, callEnabled: _this2.isCallEnabled(_this2.state.service, _this2.state.procedure, contentType) });
+	            _this2.setState({ requestContentType: contentType, callEnabled: _this2.isCallEnabled(_this2.state.service, _this2.state.procedure, contentType) });
 	        };
 	
 	        _this2.handleTimeoutChanged = function (timeout) {
@@ -43790,17 +43856,17 @@
 	            _this2.setState({ responseError: null, response: null, loading: true });
 	
 	            var _this = _this2;
-	            var body = _this2.state.body.trim();
+	            var body = typeof _this2.state.body !== "undefined" ? _this2.state.body.trim() : null;
 	
-	            if (body && _this2.state.contentType == 'application/json') {
+	            if (body && _this2.state.requestContentType == 'application/json') {
 	                body = JSON.stringify(JSON.parse(body));
 	            }
 	
 	            var form = new FormData();
 	            form.set('service', _this2.state.service);
 	            form.set('procedure', _this2.state.procedure);
-	            form.set('contentType', _this2.state.contentType);
 	            form.set('timeout', _this2.state.timeout);
+	            form.set('contentType', _this2.state.requestContentType);
 	            form.set('body', body);
 	
 	            var payload = {
@@ -43830,12 +43896,15 @@
 	        };
 	
 	        _this2.state = {
-	            callEnabled: _this2.isCallEnabled(_this2.props.request.service, _this2.props.request.procedure, _this2.props.request.contentType),
+	            callEnabled: _this2.isCallEnabled(_this2.props.request.service, _this2.props.request.procedure, _this2.props.request.requestContentType),
 	            service: _this2.props.request.service,
 	            procedure: _this2.props.request.procedure,
-	            contentType: _this2.props.request.contentType,
-	            timeout: 5,
-	            spec: _this2.props.request.spec
+	            requestContentType: _this2.props.request.requestContentType,
+	            requestSpec: _this2.props.request.requestSpec,
+	            responseContentType: _this2.props.request.responseContentType,
+	            responseSpec: _this2.props.request.responseSpec,
+	            fakeBody: _this2.props.request.fakeBody,
+	            timeout: 5
 	        };
 	        return _this2;
 	    }
@@ -43848,10 +43917,12 @@
 	                null,
 	                _react2.default.createElement(_input2.default, { type: 'text', label: 'Service', name: 'service', defaultValue: this.props.request.service, onChange: this.handleServiceChanged }),
 	                _react2.default.createElement(_input2.default, { type: 'text', label: 'Procedure', name: 'procedure', defaultValue: this.props.request.procedure, onChange: this.handleProcedureChanged }),
-	                _react2.default.createElement(_input2.default, { type: 'text', label: 'Content Type', name: 'contentType', defaultValue: this.props.request.contentType, onChange: this.handleContentTypeChanged }),
+	                _react2.default.createElement(_input2.default, { type: 'text', label: 'Request Content Type', name: 'contentType', defaultValue: this.props.request.requestContentType, onChange: this.handleContentTypeChanged }),
+	                _react2.default.createElement(_input2.default, { type: 'text', label: 'Request Spec', name: 'spec', value: this.props.request.requestSpec, multiline: true }),
+	                _react2.default.createElement(_input2.default, { type: 'text', label: 'Response Content Type', name: 'contentType', value: this.props.request.responseContentType }),
+	                _react2.default.createElement(_input2.default, { type: 'text', label: 'Response Spec', name: 'spec', value: this.props.request.responseSpec, multiline: true }),
+	                _react2.default.createElement(_input2.default, { type: 'text', label: 'Request Body (RPC payload)', name: 'body', defaultValue: this.state.fakeBody, multiline: true, onChange: this.handleBodyChanged }),
 	                _react2.default.createElement(_input2.default, { type: 'number', label: 'Timeout', name: 'timeout', defaultValue: this.state.timeout.toString(), onChange: this.handleTimeoutChanged }),
-	                _react2.default.createElement(_input2.default, { type: 'text', label: 'Spec', name: 'spec', value: this.props.request.spec, multiline: true, onChange: this.handleBodyChanged }),
-	                _react2.default.createElement(_input2.default, { type: 'text', label: 'Body', name: 'body', multiline: true, onChange: this.handleBodyChanged }),
 	                _react2.default.createElement(_button.Button, { label: 'Call', raised: true, primary: true, disabled: !this.state.callEnabled, onClick: this.doRPC }),
 	                _react2.default.createElement('br', null),
 	                _react2.default.createElement('br', null),

@@ -2,6 +2,7 @@ import React from 'react';
 import Input from 'react-toolbox/lib/input';
 import {Button, IconButton} from 'react-toolbox/lib/button';
 import ProgressBar from 'react-toolbox/lib/progress_bar';
+import Chip from 'react-toolbox/lib/chip';
 
 class Request extends React.Component {
 
@@ -9,12 +10,15 @@ class Request extends React.Component {
         super(props);
 
         this.state = {
-            callEnabled: this.isCallEnabled(this.props.request.service, this.props.request.procedure, this.props.request.contentType),
+            callEnabled: this.isCallEnabled(this.props.request.service, this.props.request.procedure, this.props.request.requestContentType),
             service: this.props.request.service,
             procedure: this.props.request.procedure,
-            contentType: this.props.request.contentType,
-            timeout: 5,
-            spec: this.props.request.spec
+            requestContentType: this.props.request.requestContentType,
+            requestSpec: this.props.request.requestSpec,
+            responseContentType: this.props.request.responseContentType,
+            responseSpec: this.props.request.responseSpec,
+            fakeBody: this.props.request.fakeBody,
+            timeout: 5
         };
     }
 
@@ -23,15 +27,15 @@ class Request extends React.Component {
     }
 
     handleServiceChanged = (service) => {
-        this.setState({service, callEnabled: this.isCallEnabled(service, this.state.procedure, this.state.contentType)})
+        this.setState({service, callEnabled: this.isCallEnabled(service, this.state.procedure, this.state.requestContentType)})
     }
 
     handleProcedureChanged = (procedure) => {
-        this.setState({procedure, callEnabled: this.isCallEnabled(this.state.service, procedure, this.state.contentType)})
+        this.setState({procedure, callEnabled: this.isCallEnabled(this.state.service, procedure, this.state.requestContentType)})
     }
 
     handleContentTypeChanged = (contentType) => {
-        this.setState({contentType, callEnabled: this.isCallEnabled(this.state.service, this.state.procedure, contentType)})
+        this.setState({requestContentType: contentType, callEnabled: this.isCallEnabled(this.state.service, this.state.procedure, contentType)})
     }
 
     handleTimeoutChanged = (timeout) => {
@@ -46,17 +50,17 @@ class Request extends React.Component {
         this.setState({responseError: null, response: null, loading: true})
 
         var _this = this
-        var body = this.state.body.trim()
+        var body = typeof(this.state.body) !== "undefined" ? this.state.body.trim() : null;
 
-        if (body && this.state.contentType == 'application/json') {
+        if (body && this.state.requestContentType == 'application/json') {
             body = JSON.stringify(JSON.parse(body))
         }
 
         var form = new FormData();
         form.set('service', this.state.service)
         form.set('procedure', this.state.procedure)
-        form.set('contentType', this.state.contentType)
         form.set('timeout', this.state.timeout)
+        form.set('contentType', this.state.requestContentType)
         form.set('body', body)
 
         var payload = {
@@ -90,10 +94,15 @@ class Request extends React.Component {
             <div>
                 <Input type='text' label='Service' name='service' defaultValue={this.props.request.service} onChange={this.handleServiceChanged}/>
                 <Input type='text' label='Procedure' name='procedure' defaultValue={this.props.request.procedure} onChange={this.handleProcedureChanged}/>
-                <Input type='text' label='Content Type' name='contentType' defaultValue={this.props.request.contentType} onChange={this.handleContentTypeChanged}/>
+
+                <Input type='text' label='Request Content Type' name='contentType' defaultValue={this.props.request.requestContentType} onChange={this.handleContentTypeChanged}/>
+                <Input type='text' label='Request Spec' name='spec' value={this.props.request.requestSpec} multiline/>
+
+                <Input type='text' label='Response Content Type' name='contentType' value={this.props.request.responseContentType}/>
+                <Input type='text' label='Response Spec' name='spec' value={this.props.request.responseSpec} multiline/>
+
+                <Input type='text' label='Request Body (RPC payload)' name='body' defaultValue={this.state.fakeBody} multiline onChange={this.handleBodyChanged}/>
                 <Input type='number' label='Timeout' name='timeout' defaultValue={this.state.timeout.toString()} onChange={this.handleTimeoutChanged}/>
-                <Input type='text' label='Spec' name='spec' value={this.props.request.spec} multiline onChange={this.handleBodyChanged}/>
-                <Input type='text' label='Body' name='body' multiline onChange={this.handleBodyChanged}/>
                 <Button label='Call' raised primary disabled={!this.state.callEnabled} onClick={this.doRPC}/>
 
                 <br/><br/><br/>

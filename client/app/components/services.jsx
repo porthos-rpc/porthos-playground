@@ -18,7 +18,7 @@ class Services extends React.Component {
                             <ListItem
                                 key={service.service + spec}
                                 caption={spec}
-                                legend={'Content-Type: ' + service.specs[spec].contentType}
+                                legend={service.specs[spec].description}
                                 onClick={() => this.props.onServiceClicked(service.service, spec, service.specs[spec])}/>
                         ))}
                         <ListDivider />
