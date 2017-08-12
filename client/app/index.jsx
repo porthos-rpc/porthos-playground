@@ -66,9 +66,9 @@ class App extends React.Component {
                 service: service,
                 procedure: procedure,
                 requestContentType: spec.request.contentType,
-                requestSpec: JSON.stringify(spec.request.body, null, 4),
+                requestSpec: spec.request.body,
                 responseContentType: spec.response.contentType,
-                responseSpec: JSON.stringify(spec.response.body, null, 4),
+                responseSpec: spec.response.body,
                 fakeBody: JSON.stringify(this.makeFakeBody(spec.request.contentType, spec.request.body), null, 4)
             }
         });

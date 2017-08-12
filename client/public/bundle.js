@@ -164,9 +164,9 @@
 	                    service: service,
 	                    procedure: procedure,
 	                    requestContentType: spec.request.contentType,
-	                    requestSpec: JSON.stringify(spec.request.body, null, 4),
+	                    requestSpec: spec.request.body,
 	                    responseContentType: spec.response.contentType,
-	                    responseSpec: JSON.stringify(spec.response.body, null, 4),
+	                    responseSpec: spec.response.body,
 	                    fakeBody: JSON.stringify(this.makeFakeBody(spec.request.contentType, spec.request.body), null, 4)
 	                }
 	            });
@@ -43812,6 +43812,16 @@
 	
 	var _chip2 = _interopRequireDefault(_chip);
 	
+	var _reactCollapsible = __webpack_require__(/*! react-collapsible */ 485);
+	
+	var _reactCollapsible2 = _interopRequireDefault(_reactCollapsible);
+	
+	var _list = __webpack_require__(/*! react-toolbox/lib/list */ 308);
+	
+	var _request = __webpack_require__(/*! ./request.css */ 486);
+	
+	var _request2 = _interopRequireDefault(_request);
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 	
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -43910,6 +43920,132 @@
 	    }
 	
 	    _createClass(Request, [{
+	        key: 'makeObjectItem',
+	        value: function makeObjectItem(field, fieldSpec) {
+	            if (typeof fieldSpec.body !== "undefined") {
+	                return this.makeSpec(field, fieldSpec.body, fieldSpec.description);
+	            }
+	
+	            return _react2.default.createElement(
+	                'div',
+	                null,
+	                _react2.default.createElement(
+	                    'div',
+	                    null,
+	                    _react2.default.createElement(
+	                        'table',
+	                        null,
+	                        _react2.default.createElement(
+	                            'tbody',
+	                            null,
+	                            _react2.default.createElement(
+	                                'tr',
+	                                null,
+	                                field !== null ? _react2.default.createElement(
+	                                    'td',
+	                                    { width: '300' },
+	                                    _react2.default.createElement(
+	                                        'strong',
+	                                        null,
+	                                        field
+	                                    )
+	                                ) : null,
+	                                _react2.default.createElement(
+	                                    'td',
+	                                    null,
+	                                    fieldSpec.type
+	                                )
+	                            )
+	                        )
+	                    )
+	                ),
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: _request2.default.fieldDesc },
+	                    _react2.default.createElement(
+	                        'span',
+	                        null,
+	                        fieldSpec.description
+	                    )
+	                )
+	            );
+	        }
+	    }, {
+	        key: 'makeObjectItems',
+	        value: function makeObjectItems(spec) {
+	            var _this3 = this;
+	
+	            return Object.keys(spec).map(function (field) {
+	                return _react2.default.createElement(
+	                    'div',
+	                    { key: field },
+	                    _react2.default.createElement(_list.ListItem, {
+	                        itemContent: _this3.makeObjectItem(field, spec[field])
+	                    }),
+	                    _react2.default.createElement(_list.ListDivider, null)
+	                );
+	            });
+	        }
+	    }, {
+	        key: 'makeSpec',
+	        value: function makeSpec(title, spec, description) {
+	            if (Array.isArray(spec)) {
+	                return _react2.default.createElement(
+	                    'div',
+	                    null,
+	                    _react2.default.createElement(
+	                        _reactCollapsible2.default,
+	                        { trigger: title + " - array",
+	                            className: _request2.default.Collapsible,
+	                            openedClassName: _request2.default.Collapsible,
+	                            triggerClassName: _request2.default.Collapsible__trigger,
+	                            triggerOpenedClassName: _request2.default.Collapsible__trigger },
+	                        _react2.default.createElement(
+	                            _list.List,
+	                            null,
+	                            this.makeObjectItem(null, spec[0])
+	                        )
+	                    ),
+	                    _react2.default.createElement(
+	                        'div',
+	                        { className: _request2.default.fieldDesc },
+	                        _react2.default.createElement(
+	                            'span',
+	                            null,
+	                            description
+	                        )
+	                    )
+	                );
+	            }
+	
+	            return _react2.default.createElement(
+	                'div',
+	                null,
+	                _react2.default.createElement(
+	                    _reactCollapsible2.default,
+	                    { trigger: title ? title + " - object" : "object",
+	                        className: _request2.default.Collapsible,
+	                        openedClassName: _request2.default.Collapsible,
+	                        triggerClassName: _request2.default.Collapsible__trigger,
+	                        triggerOpenedClassName: _request2.default.Collapsible__trigger },
+	                    _react2.default.createElement(
+	                        _list.List,
+	                        null,
+	                        this.makeObjectItems(spec)
+	                    )
+	                ),
+	                _react2.default.createElement(
+	                    'div',
+	                    { className: _request2.default.fieldDesc },
+	                    _react2.default.createElement(
+	                        'span',
+	                        null,
+	                        description
+	                    )
+	                )
+	            );
+	        }
+	    }, {
 	        key: 'render',
 	        value: function render() {
 	            return _react2.default.createElement(
@@ -43918,9 +44054,9 @@
 	                _react2.default.createElement(_input2.default, { type: 'text', label: 'Service', name: 'service', defaultValue: this.props.request.service, onChange: this.handleServiceChanged }),
 	                _react2.default.createElement(_input2.default, { type: 'text', label: 'Procedure', name: 'procedure', defaultValue: this.props.request.procedure, onChange: this.handleProcedureChanged }),
 	                _react2.default.createElement(_input2.default, { type: 'text', label: 'Request Content Type', name: 'contentType', defaultValue: this.props.request.requestContentType, onChange: this.handleContentTypeChanged }),
-	                _react2.default.createElement(_input2.default, { type: 'text', label: 'Request Spec', name: 'spec', value: this.props.request.requestSpec, multiline: true }),
+	                this.props.request.requestSpec ? this.makeSpec("Request Spec", this.props.request.requestSpec) : null,
 	                _react2.default.createElement(_input2.default, { type: 'text', label: 'Response Content Type', name: 'contentType', value: this.props.request.responseContentType }),
-	                _react2.default.createElement(_input2.default, { type: 'text', label: 'Response Spec', name: 'spec', value: this.props.request.responseSpec, multiline: true }),
+	                this.props.request.responseSpec ? this.makeSpec("Response Spec", this.props.request.responseSpec) : null,
 	                _react2.default.createElement(_input2.default, { type: 'text', label: 'Request Body (RPC payload)', name: 'body', defaultValue: this.state.fakeBody, multiline: true, onChange: this.handleBodyChanged }),
 	                _react2.default.createElement(_input2.default, { type: 'number', label: 'Timeout', name: 'timeout', defaultValue: this.state.timeout.toString(), onChange: this.handleTimeoutChanged }),
 	                _react2.default.createElement(_button.Button, { label: 'Call', raised: true, primary: true, disabled: !this.state.callEnabled, onClick: this.doRPC }),
@@ -43944,6 +44080,328 @@
 	}(_react2.default.Component);
 	
 	exports.default = Request;
+
+/***/ },
+/* 485 */
+/*!*************************************************!*\
+  !*** ./~/react-collapsible/dist/Collapsible.js ***!
+  \*************************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	Object.defineProperty(exports, "__esModule", {
+	  value: true
+	});
+	
+	var _react = __webpack_require__(/*! react */ 1);
+	
+	var _react2 = _interopRequireDefault(_react);
+	
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+	
+	var Collapsible = _react2.default.createClass({
+	  displayName: 'Collapsible',
+	
+	
+	  //Set validation for prop types
+	  propTypes: {
+	    transitionTime: _react2.default.PropTypes.number,
+	    easing: _react2.default.PropTypes.string,
+	    open: _react2.default.PropTypes.bool,
+	    classParentString: _react2.default.PropTypes.string,
+	    openedClassName: _react2.default.PropTypes.string,
+	    triggerClassName: _react2.default.PropTypes.string,
+	    triggerOpenedClassName: _react2.default.PropTypes.string,
+	    contentOuterClassName: _react2.default.PropTypes.string,
+	    contentInnerClassName: _react2.default.PropTypes.string,
+	    accordionPosition: _react2.default.PropTypes.oneOfType([_react2.default.PropTypes.string, _react2.default.PropTypes.number]),
+	    handleTriggerClick: _react2.default.PropTypes.func,
+	    onOpen: _react2.default.PropTypes.func,
+	    onClose: _react2.default.PropTypes.func,
+	    trigger: _react2.default.PropTypes.oneOfType([_react2.default.PropTypes.string, _react2.default.PropTypes.element]),
+	    triggerWhenOpen: _react2.default.PropTypes.oneOfType([_react2.default.PropTypes.string, _react2.default.PropTypes.element]),
+	    triggerDisabled: _react2.default.PropTypes.bool,
+	    lazyRender: _react2.default.PropTypes.bool,
+	    overflowWhenOpen: _react2.default.PropTypes.oneOf(['hidden', 'visible', 'auto', 'scroll', 'inherit', 'initial', 'unset']),
+	    triggerSibling: _react2.default.PropTypes.element
+	  },
+	
+	  //If no transition time or easing is passed then default to this
+	  getDefaultProps: function getDefaultProps() {
+	    return {
+	      transitionTime: 400,
+	      easing: 'linear',
+	      open: false,
+	      classParentString: 'Collapsible',
+	      triggerDisabled: false,
+	      lazyRender: false,
+	      overflowWhenOpen: 'hidden',
+	      openedClassName: '',
+	      triggerClassName: '',
+	      triggerOpenedClassName: '',
+	      contentOuterClassName: '',
+	      contentInnerClassName: '',
+	      className: '',
+	      triggerSibling: null,
+	      onOpen: function onOpen() {},
+	      onClose: function onClose() {}
+	    };
+	  },
+	
+	  //Defaults the dropdown to be closed
+	  getInitialState: function getInitialState() {
+	
+	    if (this.props.open) {
+	      return {
+	        isClosed: false,
+	        shouldSwitchAutoOnNextCycle: false,
+	        height: 'auto',
+	        transition: 'none',
+	        hasBeenOpened: true,
+	        overflow: this.props.overflowWhenOpen
+	      };
+	    } else {
+	      return {
+	        isClosed: true,
+	        shouldSwitchAutoOnNextCycle: false,
+	        height: 0,
+	        transition: 'height ' + this.props.transitionTime + 'ms ' + this.props.easing,
+	        hasBeenOpened: false,
+	        overflow: 'hidden'
+	      };
+	    }
+	  },
+	
+	  // Taken from https://github.com/EvandroLG/transitionEnd/
+	  // Determines which prefixed event to listen for
+	  whichTransitionEnd: function whichTransitionEnd(element) {
+	    var transitions = {
+	      'WebkitTransition': 'webkitTransitionEnd',
+	      'MozTransition': 'transitionend',
+	      'OTransition': 'oTransitionEnd otransitionend',
+	      'transition': 'transitionend'
+	    };
+	
+	    for (var t in transitions) {
+	      if (element.style[t] !== undefined) {
+	        return transitions[t];
+	      }
+	    }
+	  },
+	
+	  componentDidMount: function componentDidMount() {
+	    var _this = this;
+	
+	    //Set up event listener to listen to transitionend so we can switch the height from fixed pixel to auto for much responsiveness;
+	    //TODO:  Once Synthetic transitionend events have been exposed in the next release of React move this funciton to a function handed to the onTransitionEnd prop
+	
+	    this.refs.outer.addEventListener(this.whichTransitionEnd(this.refs.outer), function (event) {
+	      if (_this.state.isClosed === false) {
+	        _this.setState({
+	          shouldSwitchAutoOnNextCycle: true
+	        });
+	      }
+	    });
+	  },
+	
+	  componentDidUpdate: function componentDidUpdate(prevProps) {
+	
+	    if (this.state.shouldSwitchAutoOnNextCycle === true && this.state.isClosed === false) {
+	      //Set the height to auto to make compoenent re-render with the height set to auto.
+	      //This way the dropdown will be responsive and also change height if there is another dropdown within it.
+	      this.makeResponsive();
+	    }
+	
+	    if (this.state.shouldSwitchAutoOnNextCycle === true && this.state.isClosed === true) {
+	      this.prepareToOpen();
+	    }
+	
+	    //If there has been a change in the open prop (controlled by accordion)
+	    if (prevProps.open != this.props.open) {
+	      if (this.props.open === true) {
+	        this.openCollapsible();
+	      } else {
+	        this.closeCollapsible();
+	      }
+	    }
+	  },
+	
+	  handleTriggerClick: function handleTriggerClick(event) {
+	
+	    event.preventDefault();
+	
+	    if (this.props.triggerDisabled) {
+	      return;
+	    }
+	
+	    if (this.props.handleTriggerClick) {
+	      this.props.handleTriggerClick(this.props.accordionPosition);
+	    } else {
+	
+	      if (this.state.isClosed === true) {
+	        this.openCollapsible();
+	      } else {
+	        this.closeCollapsible();
+	      }
+	    }
+	  },
+	
+	  closeCollapsible: function closeCollapsible() {
+	    this.setState({
+	      isClosed: true,
+	      shouldSwitchAutoOnNextCycle: true,
+	      height: this.refs.inner.offsetHeight,
+	      overflow: 'hidden'
+	    }, this.props.onClose);
+	  },
+	
+	  openCollapsible: function openCollapsible() {
+	    this.setState({
+	      height: this.refs.inner.offsetHeight,
+	      transition: 'height ' + this.props.transitionTime + 'ms ' + this.props.easing,
+	      isClosed: false,
+	      hasBeenOpened: true
+	    }, this.props.onOpen);
+	  },
+	
+	  makeResponsive: function makeResponsive() {
+	    this.setState({
+	      height: 'auto',
+	      transition: 'none',
+	      shouldSwitchAutoOnNextCycle: false,
+	      overflow: this.props.overflowWhenOpen
+	    });
+	  },
+	
+	  prepareToOpen: function prepareToOpen() {
+	    var _this2 = this;
+	
+	    //The height has been changes back to fixed pixel, we set a small timeout to force the CSS transition back to 0 on the next tick.
+	    window.setTimeout(function () {
+	      _this2.setState({
+	        height: 0,
+	        shouldSwitchAutoOnNextCycle: false,
+	        transition: 'height ' + _this2.props.transitionTime + 'ms ' + _this2.props.easing
+	      });
+	    }, 50);
+	  },
+	
+	  renderNonClickableTriggerElement: function renderNonClickableTriggerElement() {
+	    if (this.props.triggerSibling) {
+	      return _react2.default.createElement(
+	        'span',
+	        { className: this.props.classParentString + "__trigger-sibling" },
+	        this.props.triggerSibling
+	      );
+	    }
+	
+	    return null;
+	  },
+	
+	  render: function render() {
+	
+	    var dropdownStyle = {
+	      height: this.state.height,
+	      WebkitTransition: this.state.transition,
+	      msTransition: this.state.transition,
+	      transition: this.state.transition,
+	      overflow: this.state.overflow
+	    };
+	
+	    var openClass = this.state.isClosed ? 'is-closed' : 'is-open';
+	    var disabledClass = this.props.triggerDisabled ? 'is-disabled' : '';
+	
+	    //If user wants different text when tray is open
+	    var trigger = this.state.isClosed === false && this.props.triggerWhenOpen !== undefined ? this.props.triggerWhenOpen : this.props.trigger;
+	
+	    // Don't render children until the first opening of the Collapsible if lazy rendering is enabled
+	    var children = this.props.children;
+	    if (this.props.lazyRender) if (!this.state.hasBeenOpened) children = null;
+	
+	    var triggerClassName = this.props.classParentString + "__trigger" + ' ' + openClass + ' ' + disabledClass;
+	
+	    if (this.state.isClosed) {
+	      triggerClassName = triggerClassName + ' ' + this.props.triggerClassName;
+	    } else {
+	      triggerClassName = triggerClassName + ' ' + this.props.triggerOpenedClassName;
+	    }
+	
+	    return _react2.default.createElement(
+	      'div',
+	      { className: this.props.classParentString + ' ' + (this.state.isClosed ? this.props.className : this.props.openedClassName) },
+	      _react2.default.createElement(
+	        'span',
+	        { className: triggerClassName.trim(), onClick: this.handleTriggerClick },
+	        trigger
+	      ),
+	      this.renderNonClickableTriggerElement(),
+	      _react2.default.createElement(
+	        'div',
+	        { className: this.props.classParentString + "__contentOuter" + ' ' + this.props.contentOuterClassName, ref: 'outer', style: dropdownStyle },
+	        _react2.default.createElement(
+	          'div',
+	          { className: this.props.classParentString + "__contentInner" + ' ' + this.props.contentInnerClassName, ref: 'inner' },
+	          children
+	        )
+	      )
+	    );
+	  }
+	});
+	
+	exports.default = Collapsible;
+	
+
+
+/***/ },
+/* 486 */
+/*!************************************!*\
+  !*** ./app/components/request.css ***!
+  \************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	// style-loader: Adds some css to the DOM by adding a <style> tag
+	
+	// load the styles
+	var content = __webpack_require__(/*! !../../~/css-loader?sourceMap&modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]!postcss?sourceMap&sourceComments!./request.css */ 487);
+	if(typeof content === 'string') content = [[module.id, content, '']];
+	// add the styles to the DOM
+	var update = __webpack_require__(/*! ../../~/style-loader/addStyles.js */ 201)(content, {});
+	if(content.locals) module.exports = content.locals;
+	// Hot Module Replacement
+	if(false) {
+		// When the styles change, update the <style> tags
+		if(!content.locals) {
+			module.hot.accept("!!../../node_modules/css-loader/index.js?sourceMap&modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]!postcss?sourceMap&sourceComments!./request.css", function() {
+				var newContent = require("!!../../node_modules/css-loader/index.js?sourceMap&modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]!postcss?sourceMap&sourceComments!./request.css");
+				if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+				update(newContent);
+			});
+		}
+		// When the module is disposed, remove the <style> tags
+		module.hot.dispose(function() { update(); });
+	}
+
+/***/ },
+/* 487 */
+/*!**********************************************************************************************************************************************************************************!*\
+  !*** ./~/css-loader?sourceMap&modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]!./~/postcss-loader?sourceMap&sourceComments!./app/components/request.css ***!
+  \**********************************************************************************************************************************************************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	exports = module.exports = __webpack_require__(/*! ../../~/css-loader/lib/css-base.js */ 200)();
+	// imports
+	
+	
+	// module
+	exports.push([module.id, ".request__Collapsible___17yHv {\n\tborder: 1px solid #303f9f;\n\tmargin-bottom: 12px;\n}\n\n.request__Collapsible__trigger___35eXc {\n\tbackground-color: #303f9f;\n    color: white;\n    display: block;\n    padding: 12px;\n}\n\n.request__fieldDesc___1Ti2X {\n\tmargin-top: 5px;\n    margin-left: 3px;\n    font-size: 9pt;\n\tcolor: gray;\n}", "", {"version":3,"sources":["/./app/components/request.css"],"names":[],"mappings":"AAAA;CACC,0BAA0B;CAC1B,oBAAoB;CACpB;;AAED;CACC,0BAA0B;IACvB,aAAa;IACb,eAAe;IACf,cAAc;CACjB;;AAED;CACC,gBAAgB;IACb,iBAAiB;IACjB,eAAe;CAClB,YAAY;CACZ","file":"request.css","sourcesContent":[".Collapsible {\n\tborder: 1px solid #303f9f;\n\tmargin-bottom: 12px;\n}\n\n.Collapsible__trigger {\n\tbackground-color: #303f9f;\n    color: white;\n    display: block;\n    padding: 12px;\n}\n\n.fieldDesc {\n\tmargin-top: 5px;\n    margin-left: 3px;\n    font-size: 9pt;\n\tcolor: gray;\n}"],"sourceRoot":"webpack://"}]);
+	
+	// exports
+	exports.locals = {
+		"Collapsible": "request__Collapsible___17yHv",
+		"Collapsible__trigger": "request__Collapsible__trigger___35eXc",
+		"fieldDesc": "request__fieldDesc___1Ti2X"
+	};
 
 /***/ }
 /******/ ]);

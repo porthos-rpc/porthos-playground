@@ -3,6 +3,11 @@ import Input from 'react-toolbox/lib/input';
 import {Button, IconButton} from 'react-toolbox/lib/button';
 import ProgressBar from 'react-toolbox/lib/progress_bar';
 import Chip from 'react-toolbox/lib/chip';
+import Collapsible from 'react-collapsible';
+import { List, ListItem, ListDivider } from 'react-toolbox/lib/list';
+
+import styles from "./request.css";
+
 
 class Request extends React.Component {
 
@@ -89,6 +94,73 @@ class Request extends React.Component {
         });
     }
 
+    makeObjectItem(field, fieldSpec) {
+        if (typeof(fieldSpec.body) !== "undefined") {
+            return this.makeSpec(field, fieldSpec.body, fieldSpec.description)
+        }
+
+        return <div>
+            <div>
+                <table>
+                    <tbody>
+                        <tr>
+                            {field !== null ? <td width="300"><strong>{field}</strong></td> : null}
+                            <td>{fieldSpec.type}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div className={styles.fieldDesc}>
+                <span>{fieldSpec.description}</span>
+            </div>
+        </div>
+    }
+
+    makeObjectItems(spec) {
+        return Object.keys(spec).map(field => (
+            <div key={field}>
+                <ListItem
+                    itemContent={this.makeObjectItem(field, spec[field])}
+                />
+                <ListDivider/>
+            </div>
+        ))
+    }
+
+    makeSpec(title, spec, description) {
+        if (Array.isArray(spec)) {
+            return <div>
+                <Collapsible trigger={title + " - array"}
+                             className={styles.Collapsible}
+                             openedClassName={styles.Collapsible}
+                             triggerClassName={styles.Collapsible__trigger}
+                             triggerOpenedClassName={styles.Collapsible__trigger}>
+                    <List>
+                        {this.makeObjectItem(null, spec[0])}
+                    </List>
+                </Collapsible>
+                <div className={styles.fieldDesc}>
+                    <span>{description}</span>
+                </div>
+            </div>
+        }
+
+        return <div>
+            <Collapsible trigger={title ? title + " - object" : "object"}
+                         className={styles.Collapsible}
+                         openedClassName={styles.Collapsible}
+                         triggerClassName={styles.Collapsible__trigger}
+                         triggerOpenedClassName={styles.Collapsible__trigger}>
+                <List>
+                    {this.makeObjectItems(spec)}
+                </List>
+            </Collapsible>
+            <div className={styles.fieldDesc}>
+                <span>{description}</span>
+            </div>
+        </div>
+    }
+
     render() {
         return (
             <div>
@@ -96,10 +168,10 @@ class Request extends React.Component {
                 <Input type='text' label='Procedure' name='procedure' defaultValue={this.props.request.procedure} onChange={this.handleProcedureChanged}/>
 
                 <Input type='text' label='Request Content Type' name='contentType' defaultValue={this.props.request.requestContentType} onChange={this.handleContentTypeChanged}/>
-                <Input type='text' label='Request Spec' name='spec' value={this.props.request.requestSpec} multiline/>
+                {this.props.request.requestSpec ? this.makeSpec("Request Spec", this.props.request.requestSpec) : null}
 
                 <Input type='text' label='Response Content Type' name='contentType' value={this.props.request.responseContentType}/>
-                <Input type='text' label='Response Spec' name='spec' value={this.props.request.responseSpec} multiline/>
+                {this.props.request.responseSpec ? this.makeSpec("Response Spec", this.props.request.responseSpec) : null}
 
                 <Input type='text' label='Request Body (RPC payload)' name='body' defaultValue={this.state.fakeBody} multiline onChange={this.handleBodyChanged}/>
                 <Input type='number' label='Timeout' name='timeout' defaultValue={this.state.timeout.toString()} onChange={this.handleTimeoutChanged}/>
