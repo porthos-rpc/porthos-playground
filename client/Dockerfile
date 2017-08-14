@@ -1,7 +1,7 @@
-FROM node:4.3.2
+FROM node:8.3
 
 RUN useradd --user-group --create-home --shell /bin/false app &&\
-  npm install --global npm@3.7.5
+  npm install --global yarn@latest
 
 ENV HOME=/home/app
 
@@ -10,4 +10,4 @@ RUN chown -R app:app $HOME/*
 
 USER app
 WORKDIR $HOME/playground
-RUN npm install
+RUN yarn install
