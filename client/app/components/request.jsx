@@ -70,7 +70,8 @@ class Request extends React.Component {
 
         var payload = {
             method: "POST",
-            body: form
+            body: form,
+            credentials: 'include'
         }
 
         fetch('/api/rpc', payload).then(response => {

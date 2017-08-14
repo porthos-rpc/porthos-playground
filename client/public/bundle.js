@@ -199,7 +199,9 @@
 	        value: function componentDidMount() {
 	            var _this = this;
 	
-	            fetch('/api/services').then(function (response) {
+	            fetch('/api/services', {
+	                credentials: 'include'
+	            }).then(function (response) {
 	                response.json().then(function (data) {
 	                    _this.setState({ services: data });
 	                });
@@ -45858,7 +45860,8 @@
 	
 	            var payload = {
 	                method: "POST",
-	                body: form
+	                body: form,
+	                credentials: 'include'
 	            };
 	
 	            fetch('/api/rpc', payload).then(function (response) {

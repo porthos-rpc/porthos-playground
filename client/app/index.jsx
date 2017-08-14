@@ -93,7 +93,9 @@ class App extends React.Component {
     componentDidMount() {
         var _this = this;
 
-        fetch('/api/services').then(response => {
+        fetch('/api/services', {
+            credentials: 'include'
+        }).then(response => {
           response.json().then(function(data) {
             _this.setState({services: data})
           });
