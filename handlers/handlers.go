@@ -13,7 +13,7 @@ import (
 )
 
 type responseToClient struct {
-	StatusCode  int16       `json:"statusCode"`
+	StatusCode  int32       `json:"statusCode"`
 	ContentType string      `json:"contentType"`
 	Body        interface{} `json:"body"`
 }
@@ -30,16 +30,14 @@ func NewServicesHandler(storage storage.Storage) func(w http.ResponseWriter, r *
 		specs, err := storage.GetSpecs()
 
 		if err != nil {
-			fmt.Errorf("Error getting the specs from the storage %s", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, fmt.Sprintf("Error getting the specs from the storage %s", err), http.StatusInternalServerError)
 			return
 		}
 
 		json, err := json.Marshal(specs)
 
 		if err != nil {
-			fmt.Errorf("Error converting the specs to json %s", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, fmt.Sprintf("Error converting the specs to json %s", err), http.StatusInternalServerError)
 			return
 		}
 
@@ -60,8 +58,7 @@ func NewRPCHandler(amqpURL string) func(w http.ResponseWriter, r *http.Request) 
 		b, err := porthos.NewBroker(amqpURL)
 
 		if err != nil {
-			fmt.Errorf("Error creating porthos broker %s", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, fmt.Sprintf("Error creating porthos broker %s", err), http.StatusInternalServerError)
 			return
 		}
 
@@ -70,8 +67,7 @@ func NewRPCHandler(amqpURL string) func(w http.ResponseWriter, r *http.Request) 
 		service, err := porthos.NewClient(b, serviceName, time.Duration(timeout)*time.Second)
 
 		if err != nil {
-			fmt.Errorf("Error creating porthos client %s", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, fmt.Sprintf("Error creating porthos client %s", err), http.StatusInternalServerError)
 			return
 		}
 
@@ -83,8 +79,7 @@ func NewRPCHandler(amqpURL string) func(w http.ResponseWriter, r *http.Request) 
 		response, err := service.Call(procedure).WithBodyContentType([]byte(body), contentType).Sync()
 
 		if err != nil {
-			fmt.Errorf("Error performing rpc request %s", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, fmt.Sprintf("Error performing rpc request %s", err), http.StatusInternalServerError)
 			return
 		}
 
@@ -103,8 +98,7 @@ func NewRPCHandler(amqpURL string) func(w http.ResponseWriter, r *http.Request) 
 		})
 
 		if err != nil {
-			fmt.Errorf("Error converting the response to json %s", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, fmt.Sprintf("Error converting the response to json %s", err), http.StatusInternalServerError)
 			return
 		}
 

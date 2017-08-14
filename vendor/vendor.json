@@ -21,44 +21,40 @@
 			"revisionTime": "2015-10-06T22:16:25Z"
 		},
 		{
-			"checksumSHA1": "p/qzxBRYGQTr4JKDAN8JxtSv5iU=",
+			"checksumSHA1": "SEZulQ/Gm4f6P6/c3waZjXxvl0g=",
 			"path": "github.com/jmoiron/sqlx",
-			"revision": "05b81a7d5d38058e42148dc01f17daf4acba4640",
-			"revisionTime": "2016-09-14T23:45:33Z"
+			"revision": "d9bd385d68c068f1fabb5057e3dedcbcbb039d0f",
+			"revisionTime": "2017-04-30T19:46:03Z"
 		},
 		{
-			"checksumSHA1": "NJHTyLwheqVk7+syzj9UN7p1dKs=",
+			"checksumSHA1": "xXjxKqs3ECyWO5zjIVb2qgj9rcU=",
 			"path": "github.com/jmoiron/sqlx/reflectx",
-			"revision": "05b81a7d5d38058e42148dc01f17daf4acba4640",
-			"revisionTime": "2016-09-14T23:45:33Z"
+			"revision": "d9bd385d68c068f1fabb5057e3dedcbcbb039d0f",
+			"revisionTime": "2017-04-30T19:46:03Z"
 		},
 		{
-			"checksumSHA1": "ToGxRLachRwa1HbVy7ZBdJaq5Zc=",
+			"checksumSHA1": "qNbIMcsoKG3jP+boPRo1CQn9tqA=",
 			"path": "github.com/mattn/go-sqlite3",
-			"revision": "4b0af852c17164dce48e6754e3094c55192e4934",
-			"revisionTime": "2016-09-27T02:28:46Z"
+			"revision": "6654e412c3c7eabb310d920cf73a2102dbf8c632",
+			"revisionTime": "2017-08-01T17:06:40Z"
 		},
 		{
-			"checksumSHA1": "LSp85SYzRBkeN9OAFOn/Bi9u/JU=",
+			"checksumSHA1": "JLxRKmO9uvZCZVgTWCLYAxRb6h4=",
 			"path": "github.com/porthos-rpc/porthos-go",
-			"revision": "db43356b848018a146911322b4de2e2141e62a26",
-			"revisionTime": "2017-03-28T21:21:36Z"
+			"revision": "799e15d48729513e81e910f4b3a8751b8ff8933e",
+			"revisionTime": "2017-08-14T13:09:20Z"
 		},
 		{
-			"checksumSHA1": "NXkRUe13c6FOS92fMS9UGHCAcSI=",
-			"path": "github.com/porthos-rpc/porthos-go/log",
-			"revision": "817567434089ba40cfe08a2ae354311a0424324a",
-			"revisionTime": "2017-03-22T20:19:16Z"
-		},
-		{
-			"checksumSHA1": "rKV8YLkXpeNG1Oix8hlYqVsEFb4=",
+			"checksumSHA1": "3XsmaR3i5euGHpt150DerScyOco=",
 			"path": "github.com/streadway/amqp",
-			"revision": "2e25825abdbd7752ff08b270d313b93519a0a232",
-			"revisionTime": "2016-03-11T21:55:03Z"
+			"revision": "2cbfe40c9341ad63ba23e53013b3ddc7989d801c",
+			"revisionTime": "2017-07-07T20:29:55Z"
 		},
 		{
-			"path": "https://github.com/porthos-rpc/porthos-go",
-			"revision": ""
+			"checksumSHA1": "dr5+PfIRzXeN+l1VG+s0lea9qz8=",
+			"path": "golang.org/x/net/context",
+			"revision": "1c05540f6879653db88113bc4a2b70aec4bd491f",
+			"revisionTime": "2017-08-04T00:04:37Z"
 		}
 	],
 	"rootPath": "github.com/porthos-rpc/porthos-playground"

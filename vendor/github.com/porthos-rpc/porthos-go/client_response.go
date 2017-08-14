@@ -7,8 +7,8 @@ import (
 
 // ClientResponse represents the response object of a RPC call.
 type ClientResponse struct {
-	StatusCode  int16
-	Headers     map[string]interface{}
+	StatusCode  int32
+	Headers     Headers
 	Content     []byte
 	ContentType string
 }
