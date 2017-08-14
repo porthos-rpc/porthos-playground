@@ -16,6 +16,7 @@ services:
       DB_PATH: "./playground.db"
     volumes:
      - .:/go/src/github.com/porthos-rpc/porthos-playground/
+     - ./client/public:/go/src/github.com/porthos-rpc/porthos-playground/public
     hostname: playground
   frontend:
     build: client

@@ -1,0 +1,18 @@
+FROM alpine:3.6
+
+RUN apk update \
+    && apk add --virtual .build-deps \
+        wget \
+    && wget --no-check-certificate https://github.com/jwilder/dockerize/releases/download/v0.2.0/dockerize-linux-amd64-v0.2.0.tar.gz \
+    && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-v0.2.0.tar.gz \
+    && rm -f dockerize-linux-amd64-v0.2.0.tar.gz \
+    && apk del .build-deps
+
+RUN mkdir -p /templates
+RUN mkdir -p /public
+
+ADD dist/playground /playground
+COPY ./templates  /templates
+COPY ./client/public/bundle.js  /public
+
+CMD ["/playground"]
