@@ -1,9 +1,6 @@
-FROM golang:1.8-alpine
-
-RUN apk update && apk add gcc g++
+FROM golang:1.12-alpine
 
 RUN mkdir -p /go/src/github.com/porthos-rpc/porthos-playground
-
 ADD . /go/src/github.com/porthos-rpc/porthos-playground
 WORKDIR /go/src/github.com/porthos-rpc/porthos-playground
 

@@ -2,10 +2,11 @@ package porthos
 
 import (
 	"fmt"
-	"github.com/streadway/amqp"
 	"log"
 	"sync"
 	"time"
+
+	"github.com/streadway/amqp"
 )
 
 // MethodHandler represents a rpc method handler.
@@ -15,7 +16,7 @@ type MethodHandler func(req Request, res Response)
 type Server interface {
 	// Register a method and its handler.
 	Register(method string, handler MethodHandler)
-	// Register a method and its handler.
+	// Register a method, it's handler and it's specification.
 	RegisterWithSpec(method string, handler MethodHandler, spec Spec)
 	// AddExtension adds extensions to the server instance.
 	// Extensions can be used to add custom actions to incoming and outgoing RPC calls.
@@ -26,16 +27,16 @@ type Server interface {
 	GetServiceName() string
 	// GetSpecs returns all registered specs.
 	GetSpecs() map[string]Spec
-	// Close the client and AMQP channel.
+	// Close closes the client and AMQP channel.
 	// This method returns right after the AMQP channel is closed.
-	// In order to give time to the current request to finish (if there's one)
+	// In order to give time to the current request to finish (if there's any)
 	// it's up to you to wait using the NotifyClose.
 	Close()
 	// Shutdown shuts down the client and AMQP channel.
 	// It provider graceful shutdown, since it will wait the result
 	// of <-s.NotifyClose().
 	Shutdown()
-	// NotifyClose returns a channel to be notified then this server closes.
+	// NotifyClose returns a channel to be notified when this server closes.
 	NotifyClose() <-chan bool
 }
 
@@ -78,8 +79,6 @@ func NewServer(b *Broker, serviceName string, options Options) (Server, error) {
 		return nil, err
 	}
 
-	go s.handleReestablishedConnnection()
-
 	return s, nil
 }
 
@@ -94,7 +93,7 @@ func (s *server) setupTopology() error {
 		return err
 	}
 
-	// create the response queue (let the amqp server to pick a name for us)
+	// create the response queue
 	_, err = s.channel.QueueDeclare(
 		s.serviceName, // name
 		true,          // durable
@@ -129,42 +128,42 @@ func (s *server) setupTopology() error {
 	return nil
 }
 
-func (s *server) handleReestablishedConnnection() {
+func (s *server) serve() {
 	notifyCh := s.broker.NotifyReestablish()
 
 	for !s.closed {
-		<-notifyCh
+		if !s.broker.IsConnected() {
+			<-notifyCh
 
-		err := s.setupTopology()
-
-		if err != nil {
-			log.Printf("[PORTHOS] Error setting up topology after reconnection [%s]", err)
+			continue
 		}
-	}
-}
 
-func (s *server) serve() {
-	for !s.closed {
-		if s.topologySet {
-			s.pipeThroughServerListeningExtensions()
-			s.printRegisteredMethods()
+		if !s.topologySet {
+			err := s.setupTopology()
 
-			log.Printf("[PORTHOS] Connected to the broker and waiting for incoming rpc requests...")
-
-			for d := range s.requestChannel {
-				go func(d amqp.Delivery) {
-					err := s.processRequest(d)
-
-					if err != nil {
-						log.Printf("[PORTHOS] Error processing request: %s", err)
-					}
-				}(d)
+			if err != nil {
+				log.Printf("[PORTHOS] Error setting up topology after reconnection [%s]", err)
 			}
 
-			s.topologySet = false
-		} else {
-			time.Sleep(servePollInterval)
+			continue
 		}
+
+		s.pipeThroughServerListeningExtensions()
+		s.printRegisteredMethods()
+
+		log.Printf("[PORTHOS] Connected to the broker and waiting for incoming rpc requests...")
+
+		for d := range s.requestChannel {
+			go func(d amqp.Delivery) {
+				err := s.processRequest(d)
+
+				if err != nil {
+					log.Printf("[PORTHOS] Error processing request: %s", err)
+				}
+			}(d)
+		}
+
+		s.topologySet = false
 	}
 
 	for _, c := range s.closes {
@@ -184,24 +183,34 @@ func (s *server) processRequest(d amqp.Delivery) error {
 	methodName := d.Headers["X-Method"].(string)
 
 	if method, ok := s.methods[methodName]; ok {
-		req := &request{s.serviceName, methodName, d.ContentType, d.Body}
+		req := &request{s.serviceName, methodName, d.ContentType, d.Body, nil}
+
+		res := newResponse()
+		method(req, res)
+
 		ch, err := s.broker.openChannel()
 
 		if err != nil {
 			return fmt.Errorf("Error opening channel for response: %s", err)
 		}
 
+		if err := ch.Confirm(false); err != nil {
+			return fmt.Errorf("Channel could not be put into confirm mode: %s", err)
+		}
+
+		confirms := ch.NotifyPublish(make(chan amqp.Confirmation, 1))
+
 		defer ch.Close()
 
 		resWriter := &responseWriter{delivery: d, channel: ch, autoAck: s.autoAck}
-
-		res := newResponse()
-		method(req, res)
-
 		err = resWriter.Write(res)
 
 		if err != nil {
 			return fmt.Errorf("Error writing response: %s", err)
+		} else {
+			if confirmed := <-confirms; !confirmed.Ack {
+				return ErrNotAcked
+			}
 		}
 	} else {
 		if !s.autoAck {
