@@ -1,11 +1,11 @@
-version: '2'
+version: '3'
 services:
   backend:
     build:
       context: .
       dockerfile: Dockerfile.devel
     working_dir: /go/src/github.com/porthos-rpc/porthos-playground
-    command: dockerize -wait tcp://broker:5672 -timeout 60s go run playground.go
+    command: dockerize -wait tcp://broker:5672 -timeout 60s go run main.go
     links:
      - broker
     ports:
@@ -22,8 +22,12 @@ services:
     build: client
     command: npm run watch
     volumes:
-      - ./client:/home/app/playground
-      - ./client/node_modules:/home/app/playground/node_modules
+      - ./client/app:/home/app/playground/app
+      - ./client/public:/home/app/playground/public
+      - ./client/.babelrc:/home/app/playground/.babelrc
+      - ./client/package.json:/home/app/playground/package.json
+      - ./client/webpack.development.config.js:/home/app/playground/webpack.development.config.js
+      - ./client/webpack.production.config.js:/home/app/playground/webpack.production.config.js
   broker:
     image: rabbitmq:3.6-management
     ports:

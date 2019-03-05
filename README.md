@@ -9,20 +9,6 @@ A playground application for trying out a porthos-rpc cluster.
 
 ## Build
 
-First of all, you need to download `govendor`:
-
-```sh
-go get -u github.com/kardianos/govendor
-```
-
-Fetch all go dependencies:
-
-```sh
-govendor sync
-```
-
-Then build the app:
-
 ```sh
 go build
 ```

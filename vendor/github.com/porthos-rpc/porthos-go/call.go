@@ -2,6 +2,7 @@ package porthos
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -77,8 +78,19 @@ func (c *call) withJSON(i interface{}) *call {
 // Async calls the remote method with the given arguments.
 // It returns a *Slot (which contains the response channel) and any possible error.
 func (c *call) Async() (Slot, error) {
+	if !c.client.broker.IsConnected() {
+		return nil, ErrBrokerNotConnected
+	}
+
 	res := NewSlot()
-	correlationID := res.getCorrelationID()
+	correlationID, err := res.GetCorrelationID()
+
+	if err != nil {
+		return nil, err
+	}
+
+	c.client.pushSlot(correlationID, res)
+
 	ch, err := c.client.broker.openChannel()
 
 	if err != nil {
@@ -86,6 +98,12 @@ func (c *call) Async() (Slot, error) {
 	}
 
 	defer ch.Close()
+
+	if err := ch.Confirm(false); err != nil {
+		return nil, fmt.Errorf("Channel could not be put into confirm mode: %s", err)
+	}
+
+	confirms := ch.NotifyPublish(make(chan amqp.Confirmation, 1))
 
 	err = ch.Publish(
 		"",                   // exchange
@@ -99,12 +117,16 @@ func (c *call) Async() (Slot, error) {
 			Expiration:    strconv.FormatInt(c.getTimeoutMilliseconds(), 10),
 			ContentType:   c.contentType,
 			CorrelationId: correlationID,
-			ReplyTo:       c.client.responseQueue.Name,
+			ReplyTo:       c.client.responseQueueName,
 			Body:          c.body,
 		})
 
 	if err != nil {
 		return nil, err
+	} else {
+		if confirmed := <-confirms; !confirmed.Ack {
+			return nil, ErrNotAcked
+		}
 	}
 
 	return res, nil
@@ -131,7 +153,19 @@ func (c *call) Sync() (*ClientResponse, error) {
 
 // Void calls a remote service procedure/service which will not provide any return value.
 func (c *call) Void() error {
-	err := c.client.channel.Publish(
+	if !c.client.broker.IsConnected() {
+		return ErrBrokerNotConnected
+	}
+
+	ch, err := c.client.broker.openChannel()
+
+	if err != nil {
+		return err
+	}
+
+	defer ch.Close()
+
+	err = ch.Publish(
 		"",                   // exchange
 		c.client.serviceName, // routing key
 		false,                // mandatory
